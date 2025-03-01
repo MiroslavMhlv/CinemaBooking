@@ -1,9 +1,13 @@
 package com.softuniproject.app.user.entity;
 
+import com.softuniproject.app.booking.entity.Booking;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 import java.util.UUID;
 
+@Builder
 @Entity
 @Table(name = "users")
 @Getter
@@ -30,4 +34,11 @@ public class User {
 
     @Column(nullable = false)
     private double balance = 100.0;
+
+    private String firstName;
+
+    private String lastName;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<Booking> bookings;
 }

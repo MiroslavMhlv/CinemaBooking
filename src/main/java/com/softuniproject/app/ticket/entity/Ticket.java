@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.util.UUID;
 
+@Builder
 @Entity
 @Table(name = "tickets")
 @Getter
@@ -28,4 +29,5 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "cinema_id", nullable = false)
     private Cinema cinema;
+
 }

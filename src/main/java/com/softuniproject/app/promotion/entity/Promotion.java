@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.DayOfWeek;
 import java.util.UUID;
 
+@Builder
 @Entity
 @Table(name = "promotions")
 @Getter
@@ -27,6 +28,8 @@ public class Promotion {
 
     @Column(nullable = false)
     private double discount;
+
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "cinema_id", nullable = false)

@@ -1,10 +1,14 @@
 package com.softuniproject.app.movie.entity;
 
+import com.softuniproject.app.booking.entity.Booking;
+import com.softuniproject.app.ticket.entity.Ticket;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
+@Builder
 @Entity
 @Table(name = "movies")
 @Getter
@@ -24,4 +28,10 @@ public class Movie {
 
     @Column(nullable = false)
     private int duration;
+
+    @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
+    private List<Ticket> tickets;
+
+    @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
+    private List<Booking> bookings;
 }
