@@ -5,7 +5,6 @@ import com.softuniproject.app.cinema.entity.Cinema;
 import com.softuniproject.app.cinema.service.CinemaService;
 import com.softuniproject.app.movie.entity.Movie;
 import com.softuniproject.app.movie.service.MovieService;
-import com.softuniproject.app.promotion.entity.Promotion;
 import com.softuniproject.app.ticket.entity.Ticket;
 import com.softuniproject.app.user.entity.User;
 import com.softuniproject.app.web.dto.*;
@@ -56,14 +55,6 @@ public class DtoMapper {
                 .title(request.getTitle())
                 .genre(request.getGenre())
                 .duration(request.getDuration())
-                .build();
-    }
-
-    public static Promotion mapPromotionRequestToPromotion(PromotionRequest request) {
-        return Promotion.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .discount(request.getDiscount())
                 .build();
     }
 

@@ -21,26 +21,23 @@ public class IndexController {
 
     private final UserService userService;
 
-    // 🔹 Зарежда началната страница (index.html)
     @GetMapping("/")
     public String getIndexPage() {
         return "index";
     }
 
-    // 🔹 Зарежда страницата за вход (login.html)
     @GetMapping("/login")
     public ModelAndView getLoginPage(@RequestParam(value = "error", required = false) String errorParam) {
         ModelAndView modelAndView = new ModelAndView("login");
         modelAndView.addObject("loginRequest", new UserLoginRequest());
 
         if (errorParam != null) {
-            modelAndView.addObject("errorMessage", "Incorrect username or password!");
+            modelAndView.addObject("errorMessage", "Incorrect email or password!");
         }
 
         return modelAndView;
     }
 
-    // 🔹 Зарежда страницата за регистрация (register.html)
     @GetMapping("/register")
     public ModelAndView getRegisterPage() {
         ModelAndView modelAndView = new ModelAndView("register");
@@ -48,19 +45,17 @@ public class IndexController {
         return modelAndView;
     }
 
-    // 🔹 Регистрация на нов потребител
     @PostMapping("/register")
     public ModelAndView registerNewUser(@Valid UserRegisterRequest registerRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ModelAndView("register");
         }
 
-        userService.register(registerRequest.getUsername(), registerRequest.getPassword(), registerRequest.getEmail());
+        userService.register(registerRequest.getEmail(), registerRequest.getPassword());
 
         return new ModelAndView("redirect:/login");
     }
 
-    // 🔹 Зарежда началната страница след логин (home.html)
     @GetMapping("/home")
     public ModelAndView getHomePage(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata) {
         User user = userService.getById(authenticationMetadata.getUserId());

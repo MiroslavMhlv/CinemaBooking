@@ -30,73 +30,65 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // Връщане на всички потребители с кеширане
     @Cacheable(value = "users")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // Връщане на потребител по ID
     public User getById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new DomainException("User with id [%s] does not exist.".formatted(id)));
     }
 
-    // Регистрация на нов потребител
     @CacheEvict(value = "users", allEntries = true)
     @Transactional
-    public User register(String username, String password, String email) {
-        Optional<User> optionUser = userRepository.findByUsername(username);
+    public User register(String email, String password) {
+        Optional<User> optionUser = userRepository.findByEmail(email);
         if (optionUser.isPresent()) {
-            throw new DomainException("Username [%s] already exists.".formatted(username));
+            throw new DomainException("Email [%s] already exists.".formatted(email));
         }
 
         User user = User.builder()
-                .id(UUID.randomUUID())  // Автоматично генерираме ID
-                .username(username)
-                .password(passwordEncoder.encode(password))  // Криптиране на паролата
+                .id(UUID.randomUUID())
+                .password(passwordEncoder.encode(password))
                 .email(email)
                 .role(Role.USER)
-                .balance(100.0)  // Начален баланс
+                .balance(100.0)
                 .build();
 
         userRepository.save(user);
-        log.info("User [{}] registered successfully.", user.getUsername());
+        log.info("User with email [{}] registered successfully.", user.getEmail());
         return user;
     }
 
 
-    // Обновяване на потребителска информация
     @CacheEvict(value = "users", allEntries = true)
     public void updateUser(UUID userId, String email, double balance) {
         User user = getById(userId);
         user.setEmail(email);
         user.setBalance(balance);
         userRepository.save(user);
-        log.info("User [{}] updated successfully.", user.getUsername());
+        log.info("User with email [{}] updated successfully.", user.getEmail());
     }
 
-    // Промяна на роля на потребител
     @CacheEvict(value = "users", allEntries = true)
     public void switchRole(UUID userId) {
         User user = getById(userId);
         user.setRole(user.getRole() == Role.USER ? Role.ADMIN : Role.USER);
         userRepository.save(user);
-        log.info("User [{}] switched role to [{}].", user.getUsername(), user.getRole());
+        log.info("User with email [{}] switched role to [{}].", user.getEmail(), user.getRole());
     }
 
-    // Зареждане на потребител за Spring Security
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new DomainException("User with this username does not exist."));
-        return new AuthenticationMetadata(user.getId(), username, user.getPassword(), user.getRole());
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new DomainException("User with this email does not exist."));
+        return new AuthenticationMetadata(user.getId(), email, user.getPassword(), user.getRole());
     }
 
     public void editUserDetails(UUID userId, UserEditRequest userEditRequest) {
-        User user = getById(userId); // Взимаме потребителя по ID
+        User user = getById(userId);
 
-        // Обновяваме информацията с помощта на DtoMapper
         DtoMapper.updateUserFromEditRequest(user, userEditRequest);
 
         userRepository.save(user);

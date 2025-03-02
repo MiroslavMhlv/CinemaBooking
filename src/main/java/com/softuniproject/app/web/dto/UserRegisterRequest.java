@@ -11,13 +11,12 @@ import lombok.*;
 @NoArgsConstructor
 public class UserRegisterRequest {
 
-    @Size(min = 6, message = "Username must be at least 6 characters")
-    private String username;
+    @Email(message = "Invalid email format")
+    @NotBlank
+    private String email;
 
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    @Email(message = "Invalid email format")
-    @NotBlank
-    private String email;
+
 }
